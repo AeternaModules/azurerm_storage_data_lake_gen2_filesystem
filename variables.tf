@@ -23,37 +23,13 @@ EOT
     group                    = optional(string)
     owner                    = optional(string)
     properties               = optional(map(string))
-    ace = optional(object({
+    ace = optional(list(object({
       id          = optional(string)
       permissions = string
       scope       = optional(string) # Default: "access"
       type        = string
-    }))
+    })))
   }))
-  validation {
-    condition = alltrue([
-      for k, v in var.storage_data_lake_gen2_filesystems : (
-        v.ace == null || (v.ace.scope == null || (contains(["default", "access"], v.ace.scope)))
-      )
-    ])
-    error_message = "must be one of: default, access"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.storage_data_lake_gen2_filesystems : (
-        v.ace == null || (contains(["user", "group", "mask", "other"], v.ace.type))
-      )
-    ])
-    error_message = "must be one of: user, group, mask, other"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.storage_data_lake_gen2_filesystems : (
-        v.ace == null || (v.ace.id == null || (can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", v.ace.id))))
-      )
-    ])
-    error_message = "must be a valid UUID"
-  }
   # --- Unconfirmed validation candidates, derived from azurerm_storage_data_lake_gen2_filesystem's provider source ---
   # Not auto-enabled: either a bespoke provider validator we can't safely translate,
   # or a path that crosses a list-typed block (needs its own for_each wrapping).
@@ -68,6 +44,15 @@ EOT
   #   source:    validation.Any(...) - no translation rule yet, add one
   # path: group
   #   source:    validation.Any(...) - no translation rule yet, add one
+  # path: ace.scope
+  #   condition: contains(["default", "access"], value)
+  #   message:   must be one of: default, access
+  # path: ace.type
+  #   condition: contains(["user", "group", "mask", "other"], value)
+  #   message:   must be one of: user, group, mask, other
+  # path: ace.id
+  #   condition: can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", value))
+  #   message:   must be a valid UUID
   # path: ace.permissions
   #   source:    [from validate.ADLSAccessControlPermissions] !ok
   # path: ace.permissions
