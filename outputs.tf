@@ -1,3 +1,7 @@
+output "storage_data_lake_gen2_filesystems_id" {
+  description = "Map of id values across all storage_data_lake_gen2_filesystems, keyed the same as var.storage_data_lake_gen2_filesystems"
+  value       = { for k, v in azurerm_storage_data_lake_gen2_filesystem.storage_data_lake_gen2_filesystems : k => v.id }
+}
 output "storage_data_lake_gen2_filesystems_ace" {
   description = "Map of ace values across all storage_data_lake_gen2_filesystems, keyed the same as var.storage_data_lake_gen2_filesystems"
   value       = { for k, v in azurerm_storage_data_lake_gen2_filesystem.storage_data_lake_gen2_filesystems : k => v.ace }
