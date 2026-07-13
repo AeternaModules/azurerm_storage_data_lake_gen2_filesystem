@@ -26,7 +26,7 @@ EOT
     ace = optional(list(object({
       id          = optional(string)
       permissions = string
-      scope       = optional(string) # Default: "access"
+      scope       = optional(string)
       type        = string
     })))
   }))
@@ -34,10 +34,20 @@ EOT
   # Not auto-enabled: either a bespoke provider validator we can't safely translate,
   # or a path that crosses a list-typed block (needs its own for_each wrapping).
   # Review, translate into a real validation{} block above, and delete once confirmed.
+  # path: name
+  #   source:    [from validateStorageDataLakeGen2FileSystemName] !regexp.MustCompile(`^\$root$|^[0-9a-z-]+$`).MatchString(value)
+  # path: name
+  #   source:    [from validateStorageDataLakeGen2FileSystemName] len(value) < 3 || len(value) > 63
+  # path: name
+  #   source:    [from validateStorageDataLakeGen2FileSystemName] regexp.MustCompile(`^-`).MatchString(value)
   # path: storage_account_id
   #   source:    [from commonids.ValidateStorageAccountID] !ok
   # path: storage_account_id
   #   source:    [from commonids.ValidateStorageAccountID] err != nil
+  # path: properties
+  #   source:    [from validate.MetaDataKeys] isCSharpKeyword
+  # path: properties
+  #   source:    [from validate.MetaDataKeys] !regexp.MustCompile(`^([a-z_]{1}[a-z0-9_]{1,})$`).MatchString(k)
   # path: default_encryption_scope
   #   source:    [from validate.StorageEncryptionScopeName] !regexp.MustCompile("^[0-9a-zA-Z]{4,63}$").MatchString(input)
   # path: owner
